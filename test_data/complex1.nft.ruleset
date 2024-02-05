@@ -1,0 +1,7 @@
+table inet my_filter { # handle 153
+	chain input { # handle 1
+		type filter hook input priority filter; policy accept;
+		tcp sport 53 tcp dport 1234 meta length 200 iif > 0 ip6 saddr fe80::fca5:f7ff:febc:97a4 accept # handle 2
+		tcp dport 1234 drop # handle 3
+	}
+}

@@ -1,0 +1,34 @@
+ip my_filter input 2
+  [ meta load l4proto => reg 1 ]
+  [ cmp eq reg 1 0x00000006 ]
+  [ payload load 2b @ transport header + 2 => reg 1 ]
+  [ cmp eq reg 1 0x0000d204 ]
+  [ immediate reg 0 drop ]
+
+ip6 my_filter input 2
+  [ meta load l4proto => reg 1 ]
+  [ cmp eq reg 1 0x00000006 ]
+  [ payload load 4b @ transport header + 0 => reg 1 ]
+  [ cmp eq reg 1 0xd2043500 ]
+  [ immediate reg 0 accept ]
+
+ip6 my_filter input 3 2
+  [ meta load l4proto => reg 1 ]
+  [ cmp eq reg 1 0x00000006 ]
+  [ payload load 2b @ transport header + 2 => reg 1 ]
+  [ cmp eq reg 1 0x0000d204 ]
+  [ immediate reg 0 drop ]
+
+table ip my_filter {
+	chain input {
+		type filter hook input priority filter; policy accept;
+		tcp dport 1234 drop
+	}
+}
+table ip6 my_filter {
+	chain input {
+		type filter hook input priority filter; policy accept;
+		tcp sport 53 tcp dport 1234 accept
+		tcp dport 1234 drop
+	}
+}

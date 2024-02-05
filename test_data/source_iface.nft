@@ -1,0 +1,9 @@
+#!/usr/sbin/nft -f
+
+table inet my_filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        iif enp0s31f6 tcp dport 1234 accept
+	tcp dport 1234 drop
+    }
+}

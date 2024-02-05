@@ -1,0 +1,13 @@
+#!/usr/sbin/nft -f
+
+table inet my_filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+	tcp dport 1234 jump helper
+	tcp dport 1234 accept
+    }
+    chain helper {
+        ip saddr 10.61.7.4 accept
+	tcp dport 1234 drop
+    }
+}

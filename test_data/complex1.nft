@@ -1,0 +1,9 @@
+#!/usr/sbin/nft -f
+
+table inet my_filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+	meta nfproto ipv6 tcp sport 53 meta length == 200 iif > 0 ip6 saddr fe80::fca5:f7ff:febc:97a4 tcp dport 1234 accept
+	tcp dport 1234 drop
+    }
+}

@@ -1,0 +1,12 @@
+table inet my_filter { # handle 156
+	chain input { # handle 1
+		type filter hook input priority filter; policy accept;
+		tcp dport 1234 jump helper # handle 3
+		tcp dport 1234 accept # handle 4
+	}
+
+	chain helper { # handle 2
+		ip saddr 10.61.7.4 accept # handle 5
+		tcp dport 1234 drop # handle 6
+	}
+}

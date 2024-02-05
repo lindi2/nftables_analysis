@@ -1,0 +1,16 @@
+#!/usr/sbin/nft -f
+
+table ip my_filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+	tcp dport 1234 drop
+    }
+}
+
+table ip6 my_filter {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        tcp dport 1234 tcp sport 53 accept
+	tcp dport 1234 drop
+    }
+}

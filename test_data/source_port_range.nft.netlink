@@ -1,0 +1,24 @@
+inet my_filter input 2
+  [ meta load l4proto => reg 1 ]
+  [ cmp eq reg 1 0x00000006 ]
+  [ payload load 2b @ transport header + 0 => reg 1 ]
+  [ cmp gte reg 1 0x00003200 ]
+  [ cmp lte reg 1 0x00003700 ]
+  [ payload load 2b @ transport header + 2 => reg 1 ]
+  [ cmp eq reg 1 0x0000d204 ]
+  [ immediate reg 0 accept ]
+
+inet my_filter input 3 2
+  [ meta load l4proto => reg 1 ]
+  [ cmp eq reg 1 0x00000006 ]
+  [ payload load 2b @ transport header + 2 => reg 1 ]
+  [ cmp eq reg 1 0x0000d204 ]
+  [ immediate reg 0 drop ]
+
+table inet my_filter {
+	chain input {
+		type filter hook input priority filter; policy accept;
+		tcp sport 50-55 tcp dport 1234 accept
+		tcp dport 1234 drop
+	}
+}

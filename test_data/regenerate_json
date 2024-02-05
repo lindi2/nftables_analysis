@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+for i in *.nft; do
+    nft flush ruleset
+    nft -f $i
+    nft --json list ruleset | jq . > $i.json
+    nft --json -n list ruleset | jq . > $i.json.numeric
+    nft -a list ruleset > $i.ruleset
+    nft --debug=netlink list ruleset > $i.netlink
+done
