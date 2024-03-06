@@ -19,6 +19,18 @@ def chain_priority(entry):
     return entry["chain"]["prio"]
 
 
+def is_chain(entry, family, table_name, chain_name):
+    if "chain" not in entry:
+        return False
+    if entry["chain"]["family"] != family:
+        return False
+    if entry["chain"]["table"] != table_name:
+        return False
+    if entry["chain"]["name"] != chain_name:
+        return False
+    return True
+
+
 def is_rule_in_chain(entry, family, table_name, chain_name):
     if "rule" not in entry:
         return False
@@ -132,10 +144,14 @@ class PacketSimulation:
     def eval_chain(self, family, table_name, chain_name):
         self.trace(f"  eval_chain {family} {table_name} {chain_name}")
         verdict = None
+        policy = list(map(get_chain, filter(lambda entry: is_chain(entry, family, table_name, chain_name), self.nftables)))[0].get("policy", None)
+
         for rule in map(get_rule, filter(lambda entry: is_rule_in_chain(entry, family, table_name, chain_name), self.nftables)):
             verdict = self.eval_rule(family, table_name, rule)
             if verdict is not None:
                 break
+        if verdict is None:
+            verdict = policy
         self.trace(f"  eval_chain {family} {table_name} {chain_name} => {verdict}")
         if verdict == "return":
             return None
